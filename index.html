@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web APIs</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #arrow {
+            font-size: 30vh;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+
+            window.addEventListener("deviceorientation", function (event) {
+                console.log("device orientation triggered");
+                var rotateDegrees = event.alpha;
+                var leftToRight = event.gamma;
+                var frontToBack = event.beta;
+
+                handleOrientationEvent(frontToBack, leftToRight, rotateDegrees);
+            }, true);
+
+
+            var handleOrientationEvent = function (frontToBack, leftToRight, rotateDegrees) {
+                const elem = document.getElementById('arrow');
+                elem.style.setProperty('transform', 'translateX(-50%) translateY(-50%) rotate(' + rotateDegrees + 'deg)');
+
+            };
+        });
+    </script>
+</head>
+
+<body>
+    
+    <div id="arrow">
+        ↑
+    </div>
+</body>
+
+</html>
