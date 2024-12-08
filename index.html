@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gyroscope Arrow</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    .arrow {
+      width: 50px;
+      height: 100px;
+      background-color: black;
+      clip-path: polygon(50% 0%, 100% 100%, 50% 80%, 0% 100%);
+      transition: transform 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="arrow" id="arrow"></div>
+  <script>
+    // Ziel: Pfeil zeigt immer nach oben, auch bei Drehung des Geräts
+    window.addEventListener("deviceorientation", (event) => {
+      const arrow = document.getElementById("arrow");
+
+      // Extrahiere den Rotationswinkel um die Z-Achse (alpha)
+      const rotation = event.alpha;
+
+      // Berechne die Rotation für den Pfeil (umgekehrte Richtung für oben)
+      arrow.style.transform = `rotate(${rotation * -1}deg)`;
+    });
+  </script>
+</body>
+</html>
