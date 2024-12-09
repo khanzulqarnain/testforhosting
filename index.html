@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrow App</title>
+    <title>Compass App</title>
     <style>
         body {
             margin: 0;
@@ -25,20 +25,29 @@
 </head>
 <body>
     <div id="arrow"></div>
-
     <script>
+        const arrow = document.getElementById("arrow");
+
+        // Check if DeviceOrientationEvent is supported
         if (window.DeviceOrientationEvent) {
             window.addEventListener("deviceorientation", (event) => {
-                const arrow = document.getElementById("arrow");
+                let heading;
 
-                // Rotation um die Z-Achse (alpha-Wert)
-                let alpha = event.alpha || 0;
+                // iOS uses webkitCompassHeading
+                if (event.webkitCompassHeading !== undefined) {
+                    heading = event.webkitCompassHeading; // iOS specific
+                } else if (event.alpha !== null) {
+                    heading = 360 - event.alpha; // General calculation for other devices
+                }
 
-                // Rotation auf die Richtung des Pfeils anwenden
-                arrow.style.transform = `rotate(${alpha}deg)`;
-            });
+                if (heading !== undefined) {
+                    arrow.style.transform = `rotate(${heading}deg)`;
+                } else {
+                    alert("DeviceOrientation data not available.");
+                }
+            }, true);
         } else {
-            alert("Device Orientation nicht unterstützt.");
+            alert("Device Orientation is not supported on this device.");
         }
     </script>
 </body>
