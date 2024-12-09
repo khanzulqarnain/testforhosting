@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compass App (Debug)</title>
+    <title>Compass App (User Gesture)</title>
     <style>
         body {
             display: flex;
@@ -23,44 +23,47 @@
             transform: rotate(0deg);
             margin-bottom: 20px;
         }
-        #log {
+        button {
+            padding: 10px 20px;
             font-size: 16px;
-            color: #333;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div id="arrow"></div>
-    <div id="log">Waiting for sensor data...</div>
+    <button id="startButton">Start Compass</button>
+    <div id="log">Click "Start Compass" to enable the sensor.</div>
     <script>
         const arrow = document.getElementById("arrow");
         const log = document.getElementById("log");
+        const startButton = document.getElementById("startButton");
 
-        // Check if the DeviceOrientationEvent is supported
-        if (window.DeviceOrientationEvent) {
-            log.textContent = "DeviceOrientationEvent supported. Checking permissions...";
-
-            // Request permission for iOS 13+ devices
-            if (typeof DeviceOrientationEvent.requestPermission === "function") {
-                DeviceOrientationEvent.requestPermission()
-                    .then((permissionState) => {
-                        if (permissionState === "granted") {
-                            log.textContent = "Permission granted. Starting compass...";
-                            startCompass();
-                        } else {
-                            log.textContent = "Permission denied for device orientation.";
-                        }
-                    })
-                    .catch((error) => {
-                        log.textContent = `Error requesting permission: ${error.message}`;
-                    });
+        startButton.addEventListener("click", () => {
+            if (window.DeviceOrientationEvent) {
+                if (typeof DeviceOrientationEvent.requestPermission === "function") {
+                    // iOS: Request permission
+                    DeviceOrientationEvent.requestPermission()
+                        .then((permissionState) => {
+                            if (permissionState === "granted") {
+                                log.textContent = "Permission granted. Starting compass...";
+                                startCompass();
+                            } else {
+                                log.textContent = "Permission denied for device orientation.";
+                            }
+                        })
+                        .catch((error) => {
+                            log.textContent = `Error requesting permission: ${error.message}`;
+                        });
+                } else {
+                    // Other browsers
+                    log.textContent = "Permission not required. Starting compass...";
+                    startCompass();
+                }
             } else {
-                log.textContent = "Permission not required. Starting compass...";
-                startCompass();
+                log.textContent = "Device Orientation is not supported on this device.";
             }
-        } else {
-            log.textContent = "Device Orientation is not supported on this device.";
-        }
+        });
 
         function startCompass() {
             window.addEventListener("deviceorientation", (event) => {
