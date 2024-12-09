@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compass App</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #arrow {
+            width: 150px;
+            height: 20px;
+            background-color: red;
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="arrow"></div>
+    <script>
+        const arrow = document.getElementById("arrow");
+
+        // Check if the DeviceOrientationEvent is supported
+        if (window.DeviceOrientationEvent) {
+            // Request permission for iOS 13+ devices
+            if (typeof DeviceOrientationEvent.requestPermission === "function") {
+                DeviceOrientationEvent.requestPermission()
+                    .then((permissionState) => {
+                        if (permissionState === "granted") {
+                            startCompass();
+                        } else {
+                            alert("Permission to access device orientation was denied.");
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Directly start for other devices
+                startCompass();
+            }
+        } else {
+            alert("Device Orientation is not supported on this device.");
+        }
+
+        function startCompass() {
+            window.addEventListener("deviceorientation", (event) => {
+                let heading;
+
+                // iOS: Use webkitCompassHeading if available
+                if (event.webkitCompassHeading !== undefined) {
+                    heading = event.webkitCompassHeading; // iOS Safari
+                } else if (event.alpha !== null) {
+                    // Calculate heading for non-iOS devices
+                    heading = 360 - event.alpha;
+                }
+
+                // Update the arrow's rotation
+                if (heading !== undefined) {
+                    arrow.style.transform = `rotate(${heading}deg)`;
+                } else {
+                    console.error("Heading could not be determined.");
+                }
+            }, true);
+        }
+    </script>
+</body>
+</html>
