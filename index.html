@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compass App</title>
+    <title>Compass App (Debug)</title>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -20,52 +21,63 @@
             background-color: red;
             transform-origin: 50% 100%;
             transform: rotate(0deg);
+            margin-bottom: 20px;
+        }
+        #log {
+            font-size: 16px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div id="arrow"></div>
+    <div id="log">Waiting for sensor data...</div>
     <script>
         const arrow = document.getElementById("arrow");
+        const log = document.getElementById("log");
 
         // Check if the DeviceOrientationEvent is supported
         if (window.DeviceOrientationEvent) {
+            log.textContent = "DeviceOrientationEvent supported. Checking permissions...";
+
             // Request permission for iOS 13+ devices
             if (typeof DeviceOrientationEvent.requestPermission === "function") {
                 DeviceOrientationEvent.requestPermission()
                     .then((permissionState) => {
                         if (permissionState === "granted") {
+                            log.textContent = "Permission granted. Starting compass...";
                             startCompass();
                         } else {
-                            alert("Permission to access device orientation was denied.");
+                            log.textContent = "Permission denied for device orientation.";
                         }
                     })
-                    .catch(console.error);
+                    .catch((error) => {
+                        log.textContent = `Error requesting permission: ${error.message}`;
+                    });
             } else {
-                // Directly start for other devices
+                log.textContent = "Permission not required. Starting compass...";
                 startCompass();
             }
         } else {
-            alert("Device Orientation is not supported on this device.");
+            log.textContent = "Device Orientation is not supported on this device.";
         }
 
         function startCompass() {
             window.addEventListener("deviceorientation", (event) => {
                 let heading;
 
-                // iOS: Use webkitCompassHeading if available
                 if (event.webkitCompassHeading !== undefined) {
                     heading = event.webkitCompassHeading; // iOS Safari
+                    log.textContent = `Compass heading (iOS): ${heading}`;
                 } else if (event.alpha !== null) {
-                    // Calculate heading for non-iOS devices
-                    heading = 360 - event.alpha;
+                    heading = 360 - event.alpha; // General calculation for other devices
+                    log.textContent = `Alpha heading: ${heading}`;
+                } else {
+                    log.textContent = "Heading data unavailable.";
                 }
 
-                // Update the arrow's rotation
                 if (heading !== undefined) {
                     arrow.style.transform = `rotate(${heading}deg)`;
-                } else {
-                    console.error("Heading could not be determined.");
                 }
             }, true);
         }
