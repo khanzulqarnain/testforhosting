@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Device Orientation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow App</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #arrow {
+            width: 100px;
+            height: 10px;
+            background: red;
+            transform-origin: 50% 50%;
+            transform: rotate(0deg);
+        }
+    </style>
 </head>
 <body>
-  <h1>Device Orientation Test</h1>
-  <p id="status">Checking for support...</p>
-  <script>
-    if (window.DeviceOrientationEvent) {
-      document.getElementById("status").textContent = "DeviceOrientationEvent is supported!";
-      window.addEventListener("deviceorientation", (event) => {
-        document.getElementById("status").textContent = `
-          Alpha: ${event.alpha}, 
-          Beta: ${event.beta}, 
-          Gamma: ${event.gamma}`;
-      });
-    } else {
-      document.getElementById("status").textContent = "DeviceOrientationEvent is NOT supported on this device.";
-    }
-  </script>
+    <div id="arrow"></div>
+
+    <script>
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", (event) => {
+                const arrow = document.getElementById("arrow");
+
+                // Rotation um die Z-Achse (alpha-Wert)
+                let alpha = event.alpha || 0;
+
+                // Rotation auf die Richtung des Pfeils anwenden
+                arrow.style.transform = `rotate(${alpha}deg)`;
+            });
+        } else {
+            alert("Device Orientation nicht unterstützt.");
+        }
+    </script>
 </body>
 </html>
