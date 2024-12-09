@@ -3,41 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Orientation Arrow</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-      font-family: Arial, sans-serif;
-    }
-    .arrow {
-      width: 50px;
-      height: 100px;
-      background-color: black;
-      clip-path: polygon(50% 0%, 100% 100%, 50% 80%, 0% 100%);
-      transition: transform 0.2s ease;
-    }
-  </style>
+  <title>Test Device Orientation</title>
 </head>
 <body>
-  <div class="arrow" id="arrow"></div>
+  <h1>Device Orientation Test</h1>
+  <p id="status">Checking for support...</p>
   <script>
     if (window.DeviceOrientationEvent) {
+      document.getElementById("status").textContent = "DeviceOrientationEvent is supported!";
       window.addEventListener("deviceorientation", (event) => {
-        const arrow = document.getElementById("arrow");
-
-        // Rotationswinkel um die Z-Achse (alpha)
-        const rotation = event.alpha;
-
-        // Pfeil drehen, damit er nach oben zeigt
-        arrow.style.transform = `rotate(${rotation * -1}deg)`;
+        document.getElementById("status").textContent = `
+          Alpha: ${event.alpha}, 
+          Beta: ${event.beta}, 
+          Gamma: ${event.gamma}`;
       });
     } else {
-      alert("DeviceOrientationEvent wird auf diesem Gerät nicht unterstützt.");
+      document.getElementById("status").textContent = "DeviceOrientationEvent is NOT supported on this device.";
     }
   </script>
 </body>
