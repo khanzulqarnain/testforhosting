@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compass App (User Gesture)</title>
+    <title>Compass App (Mit zwei Buttons)</title>
     <style>
         body {
             display: flex;
@@ -15,15 +15,32 @@
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        #arrow {
-            width: 150px;
-            height: 20px;
-            background-color: red;
-            transform-origin: 50% 100%;
-            transform: rotate(0deg);
+        #container {
+            position: relative;
+            width: 200px;
+            height: 200px;
             margin-bottom: 20px;
         }
+        #arrow {
+            position: absolute;
+            width: 100px;
+            height: 10px;
+            background-color: red;
+            transform-origin: 0 50%;
+            transform: rotate(0deg);
+        }
+        #dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            border-radius: 50%;
+            top: 50%;
+            left: 100%;
+            transform: translate(-50%, -50%);
+        }
         button {
+            margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
@@ -31,52 +48,80 @@
     </style>
 </head>
 <body>
-    <div id="arrow"></div>
-    <button id="startButton">Start Compass</button>
-    <div id="log">Click "Start Compass" to enable the sensor.</div>
+    <div id="container">
+        <div id="arrow">
+            <div id="dot"></div>
+        </div>
+    </div>
+    <button id="task1Button">Start Task 1 (Rotation)</button>
+    <button id="task2Button">Start Task 2 (Compass)</button>
+    <div id="log">Wähle eine Aufgabe aus, um zu beginnen.</div>
     <script>
         const arrow = document.getElementById("arrow");
         const log = document.getElementById("log");
-        const startButton = document.getElementById("startButton");
+        const task1Button = document.getElementById("task1Button");
+        const task2Button = document.getElementById("task2Button");
 
-        startButton.addEventListener("click", () => {
+        task1Button.addEventListener("click", () => {
+            log.textContent = "Task 1: Rotation basierend auf der Z-Achse gestartet.";
+            startTask1();
+        });
+
+        task2Button.addEventListener("click", () => {
+            log.textContent = "Task 2: Kompassfunktion gestartet.";
+            startTask2();
+        });
+
+        function startTask1() {
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener("deviceorientation", (event) => {
+                    const alpha = event.alpha || 0; // Rotation um die Z-Achse
+                    arrow.style.transform = `rotate(${alpha}deg)`;
+                    log.textContent = `Z-Axis Rotation: ${Math.round(alpha)}°`;
+                }, true);
+            } else {
+                log.textContent = "Device Orientation wird nicht unterstützt.";
+            }
+        }
+
+        function startTask2() {
             if (window.DeviceOrientationEvent) {
                 if (typeof DeviceOrientationEvent.requestPermission === "function") {
-                    // iOS: Request permission
+                    // iOS: Erlaubnis anfordern
                     DeviceOrientationEvent.requestPermission()
                         .then((permissionState) => {
                             if (permissionState === "granted") {
-                                log.textContent = "Permission granted. Starting compass...";
-                                startCompass();
+                                log.textContent = "Erlaubnis erteilt. Kompassfunktion wird aktiviert.";
+                                enableCompass();
                             } else {
-                                log.textContent = "Permission denied for device orientation.";
+                                log.textContent = "Erlaubnis verweigert.";
                             }
                         })
                         .catch((error) => {
-                            log.textContent = `Error requesting permission: ${error.message}`;
+                            log.textContent = `Fehler beim Anfordern der Erlaubnis: ${error.message}`;
                         });
                 } else {
-                    // Other browsers
-                    log.textContent = "Permission not required. Starting compass...";
-                    startCompass();
+                    // Andere Geräte
+                    log.textContent = "Kompassfunktion wird aktiviert.";
+                    enableCompass();
                 }
             } else {
-                log.textContent = "Device Orientation is not supported on this device.";
+                log.textContent = "Device Orientation wird nicht unterstützt.";
             }
-        });
+        }
 
-        function startCompass() {
+        function enableCompass() {
             window.addEventListener("deviceorientation", (event) => {
                 let heading;
 
                 if (event.webkitCompassHeading !== undefined) {
                     heading = event.webkitCompassHeading; // iOS Safari
-                    log.textContent = `Compass heading (iOS): ${heading}`;
+                    log.textContent = `Kompass Richtung (iOS): ${Math.round(heading)}°`;
                 } else if (event.alpha !== null) {
-                    heading = 360 - event.alpha; // General calculation for other devices
-                    log.textContent = `Alpha heading: ${heading}`;
+                    heading = 360 - event.alpha; // Allgemeine Berechnung
+                    log.textContent = `Kompass Richtung: ${Math.round(heading)}°`;
                 } else {
-                    log.textContent = "Heading data unavailable.";
+                    log.textContent = "Kompassdaten nicht verfügbar.";
                 }
 
                 if (heading !== undefined) {
